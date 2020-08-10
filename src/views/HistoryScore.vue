@@ -64,18 +64,20 @@
 			}
 		},
 		mounted() {
-			if (window.history && window.history.pushState) {
-				history.pushState(null, null, document.URL);
-				window.addEventListener('popstate', this.goBack, false);
-			}
+			// if (window.history && window.history.pushState) {
+			// 	history.pushState(null, null, document.URL);
+			// 	window.addEventListener('popstate', this.goBack, false);
+			// }
 		},
-		destroyed() {
-			window.removeEventListener('popstate', this.goBack, false);
-		},
+		// destroyed() {
+		// 	window.removeEventListener('popstate', this.goBack, false);
+		// },
 		methods: {
-			goBack() {
-				this.$router.replace({ path: '/test/historyScore' });
-			},
+			// goBack() {
+			// 	console.log('点了后退')
+			// 	// this.$router.push('/test/historyScore')
+			// 	this.$router.replace({ path: '/test/historyScore' });
+			// },
 			// 分页
 			handleSizeChange: function(size) {
 				this.pagesize = size;

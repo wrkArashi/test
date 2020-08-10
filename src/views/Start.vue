@@ -140,6 +140,7 @@
 						this.studentAnswer[i].Answer = ''
 					}
 				}
+
 				let { Status, Values } = await Joggle.end({ 'data': this.studentAnswer })
 				if (Status) {
 					this.timeShow = false
@@ -150,7 +151,7 @@
 						showCancelButton: false,
 						confirmButtonText: '确定',
 					}).then(action => {
-						this.$router.push('/test/historyScore')
+						this.$router.replace({ path: '/test/historyScore' });
 						sessionStorage.removeItem('studentAnswer');
 						sessionStorage.removeItem('testId');
 						sessionStorage.removeItem('testValue');
@@ -182,7 +183,7 @@
 							showCancelButton: false,
 							confirmButtonText: '确定',
 						}).then(action => {
-							this.$router.push('/test/historyScore')
+							this.$router.replace({ path: '/test/historyScore' });
 							sessionStorage.removeItem('studentAnswer');
 							sessionStorage.removeItem('testId');
 							sessionStorage.removeItem('testValue');

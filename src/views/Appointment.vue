@@ -230,11 +230,13 @@
 						this.$message.warning('您有进行中的考试，请前往')
 					} else {
 						this.$router.push('/test/start')
+						// this.$router.replace({ path: '/test/start' });
 					}
 				} else {
 					let { Status, Values } = await Joggle.begin({ "examID": row.ID })
 					if (Status) {
 						this.$router.push('/test/start')
+						// this.$router.replace({ path: '/test/start' });
 						// 后台传来的整张试卷是以QuestionID排序的，sortID方法将试卷以Num排序
 						// function sortId(a, b) {
 						// 	return a.Num - b.Num
