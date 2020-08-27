@@ -122,17 +122,17 @@
 		<el-dialog :modal-append-to-body='false' title="编辑试题" :visible.sync="editModalShow" :close-on-click-modal="false"
 		 :destroy-on-close="true">
 			<el-form :model="editForm" :rules="rules" ref="editForm" label-width="78px">
-				<el-form-item label="题型">
+				<el-form-item label="题型" prop="Category">
 					<el-select v-model="editForm.Category" placeholder="请选择" disabled="">
 						<el-option v-for="item in options" :label="item.label" :value="item.value"></el-option>
 					</el-select>
 				</el-form-item>
-				<el-form-item label="产品">
+				<el-form-item label="产品" prop="Product">
 					<el-select v-model="editForm.Product">
 						<el-option v-for="item in Product" :label="item.label" :value="item.value"></el-option>
 					</el-select>
 				</el-form-item>
-				<el-form-item label="模块">
+				<el-form-item label="模块" prop="Module">
 					<el-select v-model="editForm.Module">
 						<el-option v-for="item in Module" :label="item.label" :value="item.value"></el-option>
 					</el-select>
@@ -222,6 +222,14 @@
 				<el-button @click="detaileDialogVisible = false">关闭</el-button>
 			</span>
 		</el-dialog>
+		<!-- 批导失败 -->
+		<el-dialog title="失败! 请修改以下错误后重试" :visible.sync="dialogVisible" width="30%" :show-close="false" :close-on-click-modal="false"
+		 :close-on-press-escape="false">
+			<div class="nullClass" v-for="(item,index) in alert" :key="index">{{item}}</div>
+			<span slot="footer" class="dialog-footer">
+				<el-button type="primary" @click="checkHandle">确 定</el-button>
+			</span>
+		</el-dialog>
 	</el-card>
 </template>
 
@@ -295,9 +303,17 @@
 					'Explain': '',
 					"Score": ""
 				},
+				dialogVisible: false,
+				alert: [],
 				rules: {
 					Stem: { required: true, message: '题目不能为空', trigger: 'blur' },
-					Category: { required: true, message: '题型不能为空', trigger: 'blur' }
+					Category: { required: true, message: '题型不能为空', trigger: 'blur' },
+					// Brand: { required: true, message: '品牌不能为空', trigger: 'blur' },//自动添加SAP
+					Product: { required: true, message: '产品不能为空', trigger: 'blur' },
+					Version: { required: true, message: '版本不能为空', trigger: 'blur' },
+					Module: { required: true, message: '模块不能为空', trigger: 'blur' },
+					Lng: { required: true, message: '语言不能为空', trigger: 'blur' },
+					Answer: { required: true, message: '答案不能为空', trigger: 'blur' },
 				}
 			}
 		},
@@ -319,6 +335,10 @@
 			}
 		},
 		methods: {
+			checkHandle() {
+				this.dialogVisible = false
+				this.alert = []
+			},
 			// 删除多个
 			delAll() {
 				for (var i = 0; i < this.multipleSelection.length; i++) {
@@ -469,9 +489,19 @@
 			async handleSelectedFile(convertedData) {
 				var timestamp = new Date().getTime()
 				for (var i = 0; i < convertedData.body.length; i++) {
+					for (var objKey in convertedData.body[i]) {
+						if (!convertedData.body[i][objKey]) {
+							var num = i + 2
+							this.alert.push("第" + num + "行 " + objKey + " 为空值")
+						}
+					}
 					convertedData.body[i].ID = timestamp + i
 					convertedData.body[i].Attached = ''
 					if (convertedData.body[i].Category == "单选") {
+						if (convertedData.body[i].Answer.indexOf(",") > 0) {
+							num = i + 1
+							this.alert.push("第" + num + "行是单选题 Answer 只能唯一")
+						}
 						convertedData.body[i].Score = 1
 					}
 					if (convertedData.body[i].Category == "多选") {
@@ -496,15 +526,19 @@
 						convertedData.body[i].OptionF = ''
 					}
 				}
-				let { Status, Values } = await Joggle.addQus({
-					repository: this.bank,
-					data: convertedData.body
-				})
-				if (Status) {
-					this.$message.success(Values);
-					this.loadList()
+				if (this.alert.length == 0) {
+					let { Status, Values } = await Joggle.addQus({
+						repository: this.bank,
+						data: convertedData.body
+					})
+					if (Status) {
+						this.$message.success(Values);
+						this.loadList()
+					} else {
+						this.$message.warning(Values);
+					}
 				} else {
-					this.$message.warning(Values);
+					this.dialogVisible = true
 				}
 			},
 			// 图片
@@ -539,6 +573,11 @@
 
 <style lang="scss">
 	.bank {
+		.nullClass {
+			padding: 5px 0;
+			text-align: center;
+		}
+
 		.header {
 			display: flex;
 			align-items: center;
