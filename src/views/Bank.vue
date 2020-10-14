@@ -413,7 +413,10 @@
 			// 点击编辑模态框的完成
 			edit() {
 				if (this.editForm.Category == "多选") {
-					this.editForm.Answer = this.editForm.Answer.join(',')
+					if (this.editForm.Answer.length > 0) {
+						this.editForm.Answer.sort()
+						this.editForm.Answer = this.editForm.Answer.join(',')
+					}
 				}
 				this.$refs.editForm.validate(async (valid) => {
 					if (valid) {
@@ -464,6 +467,9 @@
 				}
 				if (this.form.Category == "多选") {
 					this.form.Score = 2
+					if (this.form.Answer.length > 0) {
+						this.form.Answer.sort()
+					}
 					this.form.Answer = this.form.Answer.join(',')
 				}
 				this.form.Brand = 'SAP'
